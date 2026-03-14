@@ -2,8 +2,6 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { connectDB } from "@/lib/db";
-import { Bike } from "@/models/Bike";
 import { formatINR } from "@/lib/format";
 
 export default async function ComparePage({
@@ -14,9 +12,18 @@ export default async function ComparePage({
   const { ids } = await searchParams;
   const idList = (ids ? ids.split(",") : []).filter(Boolean).slice(0, 3);
 
-  await connectDB();
   const bikes = idList.length
-    ? await Bike.find({ _id: { $in: idList } }).lean()
+    ? idList.map((id, idx) => ({ 
+        _id: id, 
+        brand: ["Royal Enfield", "KTM", "Yamaha"][idx % 3], 
+        model: ["Classic 350", "Duke 390", "R15 V4"][idx % 3], 
+        city: "Demo City", 
+        fuelType: "Petrol", 
+        price: 150000 + (idx * 20000), 
+        year: 2022, 
+        kilometers: 10000,
+        ownerType: "First owner"
+      }))
     : [];
 
   return (

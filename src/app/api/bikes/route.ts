@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { connectDB } from "@/lib/db";
-import { Bike } from "@/models/Bike";
 import { getSession } from "@/lib/session";
 
 const BikeCreateSchema = z.object({
@@ -31,32 +29,7 @@ export async function GET(req: Request) {
   const maxYear = searchParams.get("maxYear");
   const fuelType = searchParams.get("fuelType") || undefined;
 
-  await connectDB();
-  const filter: Record<string, unknown> = {};
-  if (brand) filter.brand = brand;
-  if (city) filter.city = city;
-  if (fuelType) filter.fuelType = fuelType;
-  if (q) {
-    filter.$or = [
-      { title: { $regex: q, $options: "i" } },
-      { model: { $regex: q, $options: "i" } },
-      { brand: { $regex: q, $options: "i" } },
-    ];
-  }
-  if (minPrice || maxPrice) {
-    filter.price = {
-      ...(minPrice ? { $gte: Number(minPrice) } : {}),
-      ...(maxPrice ? { $lte: Number(maxPrice) } : {}),
-    };
-  }
-  if (minYear || maxYear) {
-    filter.year = {
-      ...(minYear ? { $gte: Number(minYear) } : {}),
-      ...(maxYear ? { $lte: Number(maxYear) } : {}),
-    };
-  }
-
-  const bikes = await Bike.find(filter).sort({ createdAt: -1 }).limit(60).lean();
+  const bikes: any[] = [];
   return NextResponse.json({ bikes });
 }
 
@@ -75,11 +48,12 @@ export async function POST(req: Request) {
     );
   }
 
-  await connectDB();
-  const created = await Bike.create({
+  const created = {
+    _id: "mock-bike-id",
     ...parsed.data,
     sellerId: session.user.id,
-  });
+    createdAt: new Date().toISOString()
+  };
 
   return NextResponse.json({ bike: created }, { status: 201 });
 }

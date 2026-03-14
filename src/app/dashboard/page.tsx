@@ -3,20 +3,15 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
-import { connectDB } from "@/lib/db";
-import { Bike } from "@/models/Bike";
-import { Wishlist } from "@/models/Wishlist";
 import { formatINR } from "@/lib/format";
 
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session?.user?.id) redirect("/auth/login");
 
-  await connectDB();
-  const [bikes, wishlist] = await Promise.all([
-    Bike.find({ sellerId: session.user.id }).sort({ createdAt: -1 }).lean(),
-    Wishlist.find({ userId: session.user.id }).sort({ createdAt: -1 }).lean(),
-  ]);
+  const bikes: any[] = [];
+  const wishlist: any[] = [];
+
 
   return (
     <div className="min-h-screen bg-slate-50">

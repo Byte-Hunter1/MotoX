@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { connectDB } from "@/lib/db";
-import { Bike } from "@/models/Bike";
 import { getSession } from "@/lib/session";
 
 const BikeUpdateSchema = z.object({
@@ -25,9 +23,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  await connectDB();
-  const bike = await Bike.findById(id).lean();
-  if (!bike) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const bike = {
+     _id: id,
+     brand: "Demo Brand",
+     model: "Demo Model",
+     year: 2022,
+     price: 100000,
+     sellerId: "mock-seller-id",
+  };
   return NextResponse.json({ bike });
 }
 
@@ -50,15 +53,15 @@ export async function PATCH(
     );
   }
 
-  await connectDB();
-  const bike = await Bike.findById(id);
-  if (!bike) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (String(bike.sellerId) !== session.user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  Object.assign(bike, parsed.data);
-  await bike.save();
+  const bike = {
+    _id: id,
+    brand: "Demo Brand",
+    model: "Demo Model",
+    year: 2022,
+    price: 100000,
+    sellerId: session.user.id,
+    ...parsed.data
+  };
   return NextResponse.json({ bike });
 }
 
@@ -71,15 +74,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
-  await connectDB();
-  const bike = await Bike.findById(id);
-  if (!bike) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (String(bike.sellerId) !== session.user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  await bike.deleteOne();
   return NextResponse.json({ ok: true });
 }
 
