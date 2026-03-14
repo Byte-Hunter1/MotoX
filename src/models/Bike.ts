@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
-export interface IBike extends Document {
+export interface IBike {
   title: string;
   brand: string;
   model: string;
@@ -15,10 +15,13 @@ export interface IBike extends Document {
   sellerId: Types.ObjectId;
   registrationState?: string;
   condition?: string;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const BikeSchema: Schema<IBike> = new Schema(
+export interface IBikeDocument extends IBike, Omit<Document, "model"> {}
+
+const BikeSchema: Schema<IBikeDocument> = new Schema(
   {
     title: { type: String, required: true },
     brand: { type: String, required: true },
@@ -38,7 +41,7 @@ const BikeSchema: Schema<IBike> = new Schema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-export const Bike: Model<IBike> =
-  (mongoose.models.Bike as Model<IBike>) ||
-  mongoose.model<IBike>("Bike", BikeSchema);
+export const Bike: Model<IBikeDocument> =
+  (mongoose.models.Bike as Model<IBikeDocument>) ||
+  mongoose.model<IBikeDocument>("Bike", BikeSchema);
 

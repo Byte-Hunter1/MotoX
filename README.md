@@ -1,3 +1,60 @@
+# BikeBazaar (User App)
+
+Indian used bike marketplace built with:
+
+- Next.js App Router
+- TailwindCSS + shadcn/ui
+- MongoDB + Mongoose
+- NextAuth (Google + email/password)
+- Cloudinary image uploads
+
+## Run locally
+
+1. Ensure **MongoDB** is running locally.
+2. Create env file:
+
+```bash
+cd user-app
+cp .env.example .env.local
+```
+
+3. Update `user-app/.env.local`:
+
+- `MONGODB_URI=mongodb://127.0.0.1:27017/bikebazaar`
+- `NEXTAUTH_SECRET=...`
+- (optional) Google OAuth keys
+- (required for selling with photos) Cloudinary keys
+
+4. Start dev server:
+
+```bash
+npm run dev
+```
+
+App runs at `http://localhost:3000`.
+
+## Key routes
+
+- `/` homepage
+- `/bikes` browse marketplace
+- `/bikes/[id]` bike details
+- `/sell` post a listing (requires login)
+- `/dashboard` manage listings + wishlist (requires login)
+- `/compare?ids=ID1,ID2,ID3` compare bikes
+- `/auth/login` login
+- `/auth/register` signup
+
+## API routes
+
+- `GET /api/bikes` list bikes (supports filters: `brand`, `city`, `q`, `minPrice`, `maxPrice`, `minYear`, `maxYear`, `fuelType`)
+- `POST /api/bikes` create bike (auth required)
+- `GET /api/bikes/:id` get bike
+- `PATCH /api/bikes/:id` update bike (owner only)
+- `DELETE /api/bikes/:id` delete bike (owner only)
+- `GET /api/wishlist` list wishlist (auth required)
+- `POST /api/wishlist` toggle wishlist (auth required) body: `{ bikeId }`
+- `POST /api/upload` upload a base64 image to Cloudinary (auth required)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

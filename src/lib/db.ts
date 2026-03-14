@@ -7,7 +7,6 @@ if (!MONGODB_URI) {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var _mongooseConn: {
     conn: typeof mongoose | null;
     promise: Promise<typeof mongoose> | null;
@@ -31,15 +30,16 @@ if (!cached) {
 }
 
 export async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
+  const c = globalWithMongoose._mongooseConn!;
+  if (c.conn) {
+    return c.conn;
   }
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((m) => m);
+  if (!c.promise) {
+    c.promise = mongoose.connect(MONGODB_URI).then((m) => m);
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  c.conn = await c.promise;
+  return c.conn;
 }
 
